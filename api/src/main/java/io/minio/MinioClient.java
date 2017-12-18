@@ -19,109 +19,36 @@ package io.minio;
 
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.ByteStreams;
-
-import io.minio.errors.ErrorResponseException;
-import io.minio.errors.InsufficientDataException;
-import io.minio.errors.InternalException;
-import io.minio.errors.InvalidArgumentException;
-import io.minio.errors.InvalidBucketNameException;
-import io.minio.errors.InvalidEncryptionMetadataException;
-import io.minio.errors.InvalidEndpointException;
-import io.minio.errors.InvalidExpiresRangeException;
-import io.minio.errors.InvalidObjectPrefixException;
-import io.minio.errors.InvalidPortException;
-import io.minio.errors.NoResponseException;
-import io.minio.errors.RegionConflictException;
+import io.minio.errors.*;
 import io.minio.http.HeaderParser;
 import io.minio.http.Method;
 import io.minio.http.Scheme;
-import io.minio.messages.Bucket;
-import io.minio.messages.CompleteMultipartUpload;
-import io.minio.messages.CopyObjectResult;
-import io.minio.messages.CreateBucketConfiguration;
-import io.minio.messages.DeleteError;
-import io.minio.messages.DeleteObject;
-import io.minio.messages.DeleteRequest;
-import io.minio.messages.DeleteResult;
-import io.minio.messages.ErrorResponse;
-import io.minio.messages.InitiateMultipartUploadResult;
-import io.minio.messages.Item;
-import io.minio.messages.ListAllMyBucketsResult;
-import io.minio.messages.ListBucketResult;
-import io.minio.messages.ListBucketResultV1;
-import io.minio.messages.ListMultipartUploadsResult;
-import io.minio.messages.ListPartsResult;
-import io.minio.messages.Part;
-import io.minio.messages.Prefix;
-import io.minio.messages.Upload;
-import io.minio.messages.NotificationConfiguration;
+import io.minio.messages.*;
 import io.minio.org.apache.commons.validator.routines.InetAddressValidator;
-import io.minio.policy.PolicyType;
 import io.minio.policy.BucketPolicy;
-
-import okhttp3.HttpUrl;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import io.minio.policy.PolicyType;
+import okhttp3.*;
 import okio.BufferedSink;
 import okio.Okio;
-
-import org.joda.time.DateTime;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.RandomAccessFile;
-import java.io.StringReader;
+import javax.crypto.*;
+import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.*;
+import java.io.*;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.KeyPair;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import java.nio.file.*;
+import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
+import java.time.ZonedDateTime;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 /**
  * <p>
@@ -978,8 +905,8 @@ public class MinioClient {
     if (sha256Hash != null) {
       requestBuilder.header("x-amz-content-sha256", sha256Hash);
     }
-    DateTime date = new DateTime();
-    requestBuilder.header("x-amz-date", date.toString(DateFormat.AMZ_DATE_FORMAT));
+    ZonedDateTime date = ZonedDateTime.now();
+    requestBuilder.header("x-amz-date", DateFormat.AMZ_DATE_FORMAT.format(date));
 
     if (chunkedUpload) {
       // Add empty request body for calculating seed signature.

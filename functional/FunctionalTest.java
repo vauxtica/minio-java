@@ -15,32 +15,29 @@
  * limitations under the License.
  */
 
-import java.security.*;
-import java.math.BigInteger;
-import java.util.*;
+import io.minio.*;
+import io.minio.errors.ErrorResponseException;
+import io.minio.messages.*;
+import io.minio.policy.PolicyType;
+import okhttp3.*;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-
 import java.io.*;
-
-import static java.nio.file.StandardOpenOption.*;
-import java.nio.file.*;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.SecureRandom;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.*;
 
-import org.joda.time.DateTime;
-
-import okhttp3.OkHttpClient;
-import okhttp3.HttpUrl;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.MultipartBody;
-import okhttp3.Response;
-
-import io.minio.*;
-import io.minio.messages.*;
-import io.minio.errors.*;
-import io.minio.policy.*;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
 
 
 public class FunctionalTest {
@@ -1616,7 +1613,7 @@ public class FunctionalTest {
     long startTime = System.currentTimeMillis();
     try {
       String objectName = getRandomName();
-      PostPolicy policy = new PostPolicy(bucketName, objectName, DateTime.now().plusDays(7));
+      PostPolicy policy = new PostPolicy(bucketName, objectName, ZonedDateTime.now().plusDays(7));
       policy.setContentRange(1 * MB, 4 * MB);
       Map<String, String> formData = client.presignedPostPolicy(policy);
 
@@ -1926,7 +1923,7 @@ public class FunctionalTest {
       client.makeBucket(destBucketName);
 
       CopyConditions modifiedDateCondition = new CopyConditions();
-      DateTime dateRepresentation = new DateTime(2015, Calendar.MAY, 3, 10, 10);
+      ZonedDateTime dateRepresentation = ZonedDateTime.of(2015, Calendar.MAY, 3, 10, 10, 0, 0, ZoneId.of("UTC"));
 
       modifiedDateCondition.setModified(dateRepresentation);
 
@@ -1972,7 +1969,7 @@ public class FunctionalTest {
       client.makeBucket(destBucketName);
 
       CopyConditions invalidUnmodifiedCondition = new CopyConditions();
-      DateTime dateRepresentation = new DateTime(2015, Calendar.MAY, 3, 10, 10);
+      ZonedDateTime dateRepresentation = ZonedDateTime.of(2015, Calendar.MAY, 3, 10, 10, 0, 0, ZoneId.of("UTC"));
 
       invalidUnmodifiedCondition.setUnmodified(dateRepresentation);
 

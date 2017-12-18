@@ -19,12 +19,11 @@ package io.minio;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Map;
-
-import org.joda.time.DateTime;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
@@ -42,14 +41,14 @@ public class PostPolicy {
   private final String bucketName;
   private final String objectName;
   private final boolean startsWith;
-  private final DateTime expirationDate;
+  private final ZonedDateTime expirationDate;
   private String contentType;
   private String contentEncoding;
   private long contentRangeStart;
   private long contentRangeEnd;
 
 
-  public PostPolicy(String bucketName, String objectName, DateTime expirationDate)
+  public PostPolicy(String bucketName, String objectName, ZonedDateTime expirationDate)
     throws InvalidArgumentException {
     this(bucketName, objectName, false, expirationDate);
   }
@@ -59,7 +58,7 @@ public class PostPolicy {
    * Creates PostPolicy for given bucket name, object name, string to match object name starting with
    * and expiration time.
    */
-  public PostPolicy(String bucketName, String objectName, boolean startsWith, DateTime expirationDate)
+  public PostPolicy(String bucketName, String objectName, boolean startsWith, ZonedDateTime expirationDate)
     throws InvalidArgumentException {
     if (bucketName == null) {
       throw new InvalidArgumentException("null bucket name");
@@ -148,7 +147,7 @@ public class PostPolicy {
     sb.append("{");
 
     if (expirationDate != null) {
-      sb.append("\"expiration\":" + "\"" + expirationDate.toString(DateFormat.EXPIRATION_DATE_FORMAT) + "\"");
+      sb.append("\"expiration\":" + "\"" + DateFormat.EXPIRATION_DATE_FORMAT.format(expirationDate) + "\"");
     }
 
     if (!conditions.isEmpty()) {
@@ -228,12 +227,12 @@ public class PostPolicy {
     conditions.add(new String[]{"eq", "$x-amz-algorithm", ALGORITHM});
     formData.put("x-amz-algorithm", ALGORITHM);
 
-    DateTime date = new DateTime();
+    ZonedDateTime date = ZonedDateTime.now();
     String credential = Signer.credential(accessKey, date, region);
     conditions.add(new String[]{"eq", "$x-amz-credential", credential});
     formData.put("x-amz-credential", credential);
 
-    String amzDate = date.toString(DateFormat.AMZ_DATE_FORMAT);
+    String amzDate = DateFormat.AMZ_DATE_FORMAT.format(date);
     conditions.add(new String[]{"eq","$x-amz-date", amzDate});
     formData.put("x-amz-date", amzDate);
 

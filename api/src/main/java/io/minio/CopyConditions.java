@@ -17,13 +17,12 @@
 
 package io.minio;
 
+import io.minio.errors.InvalidArgumentException;
+
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.joda.time.DateTime;
-
-import io.minio.errors.InvalidArgumentException;
 
 /**
  * A container class to hold all the Conditions to be checked
@@ -42,11 +41,11 @@ public class CopyConditions {
    * @throws InvalidArgumentException
    *           When date is null
    */
-  public void setModified(DateTime date) throws InvalidArgumentException {
+  public void setModified(ZonedDateTime date) throws InvalidArgumentException {
     if (date == null) {
       throw new InvalidArgumentException("Date cannot be empty");
     }
-    copyConditions.put("x-amz-copy-source-if-modified-since", date.toString(DateFormat.HTTP_HEADER_DATE_FORMAT));
+    copyConditions.put("x-amz-copy-source-if-modified-since", DateFormat.HTTP_HEADER_DATE_FORMAT.format(date));
   }
 
   /**
@@ -55,12 +54,12 @@ public class CopyConditions {
    * @throws InvalidArgumentException
    *           When date is null
    */
-  public void setUnmodified(DateTime date) throws InvalidArgumentException {
+  public void setUnmodified(ZonedDateTime date) throws InvalidArgumentException {
     if (date == null) {
       throw new InvalidArgumentException("Date can not be null");
     }
 
-    copyConditions.put("x-amz-copy-source-if-unmodified-since", date.toString(DateFormat.HTTP_HEADER_DATE_FORMAT));
+    copyConditions.put("x-amz-copy-source-if-unmodified-since", DateFormat.HTTP_HEADER_DATE_FORMAT.format(date));
   }
 
   /**

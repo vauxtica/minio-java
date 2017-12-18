@@ -16,6 +16,7 @@
 
 package io.minio.messages;
 
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -74,7 +75,7 @@ public class Item extends XmlEntity {
    * Returns last modified time of the object.
    */
   public Date lastModified() {
-    return DateFormat.RESPONSE_DATE_FORMAT.parseDateTime(lastModified).toDate();
+    return Date.from(ZonedDateTime.from(DateFormat.RESPONSE_DATE_FORMAT.parse(lastModified)).toInstant());
   }
 
 

@@ -16,11 +16,10 @@
 
 package io.minio;
 
-import java.util.Date;
-
-import org.joda.time.DateTime;
-
 import io.minio.http.Header;
+
+import java.time.ZonedDateTime;
+import java.util.Date;
 
 
 /**
@@ -32,11 +31,11 @@ public class ResponseHeader {
   @Header("Content-Type")
   private String contentType;
   @Header("Date")
-  private DateTime date;
+  private ZonedDateTime date;
   @Header("ETag")
   private String etag;
   @Header("Last-Modified")
-  private DateTime lastModified;
+  private ZonedDateTime lastModified;
   @Header("Server")
   private String server;
   @Header("Status Code")
@@ -93,7 +92,7 @@ public class ResponseHeader {
    * Sets date.
    */
   public void setDate(String date) {
-    this.date = DateFormat.HTTP_HEADER_DATE_FORMAT.parseDateTime(date);
+    this.date = ZonedDateTime.from(DateFormat.HTTP_HEADER_DATE_FORMAT.parse(date));
   }
 
 
@@ -101,7 +100,7 @@ public class ResponseHeader {
    * Returns date.
    */
   public Date date() {
-    return this.date.toDate();
+    return Date.from(this.date.toInstant());
   }
 
 
@@ -125,7 +124,7 @@ public class ResponseHeader {
    * Sets last modified time.
    */
   public void setLastModified(String lastModified) {
-    this.lastModified = DateFormat.HTTP_HEADER_DATE_FORMAT.parseDateTime(lastModified);
+    this.lastModified = ZonedDateTime.from(DateFormat.HTTP_HEADER_DATE_FORMAT.parse(lastModified));
   }
 
 
@@ -133,7 +132,7 @@ public class ResponseHeader {
    * Returns last modified time.
    */
   public Date lastModified() {
-    return this.lastModified.toDate();
+    return Date.from(this.lastModified.toInstant());
   }
 
 

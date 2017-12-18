@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-import java.io.IOException;
-import java.util.Map;
-import java.security.NoSuchAlgorithmException;
-import java.security.InvalidKeyException;
-
-import org.xmlpull.v1.XmlPullParserException;
-import org.joda.time.DateTime;
-
 import io.minio.MinioClient;
 import io.minio.PostPolicy;
 import io.minio.errors.MinioException;
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.time.ZonedDateTime;
+import java.util.Map;
 
 public class PresignedPostPolicy {
   /**
@@ -42,7 +41,7 @@ public class PresignedPostPolicy {
       //                                           "YOUR-SECRETACCESSKEY");
 
       // Create new PostPolicy object for 'my-bucketname', 'my-objectname' and 7 days expire time from now.
-      PostPolicy policy = new PostPolicy("my-bucketname", "my-objectname", DateTime.now().plusDays(7));
+      PostPolicy policy = new PostPolicy("my-bucketname", "my-objectname", ZonedDateTime.now().plusDays(7));
       // 'my-objectname' should be 'image/png' content type
       policy.setContentType("image/png");
       Map<String,String> formData = minioClient.presignedPostPolicy(policy);

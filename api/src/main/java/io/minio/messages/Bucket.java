@@ -16,13 +16,12 @@
 
 package io.minio.messages;
 
-import java.util.Date;
-
+import com.google.api.client.util.Key;
+import io.minio.DateFormat;
 import org.xmlpull.v1.XmlPullParserException;
 
-import com.google.api.client.util.Key;
-
-import io.minio.DateFormat;
+import java.time.ZonedDateTime;
+import java.util.Date;
 
 
 /**
@@ -54,6 +53,6 @@ public class Bucket extends XmlEntity {
    * Returns creation date.
    */
   public Date creationDate() {
-    return DateFormat.RESPONSE_DATE_FORMAT.parseDateTime(creationDate).toDate();
+    return Date.from(ZonedDateTime.from(DateFormat.RESPONSE_DATE_FORMAT.parse(creationDate)).toInstant());
   }
 }
